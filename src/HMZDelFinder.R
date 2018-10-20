@@ -11,7 +11,7 @@ getKVdf <- function(xx, split.char=",",removequotes=F){
 	kv
 }
 read.vcf.header <- function(file){
-	line <- scan(file=pipe(paste ("bzcat", file)), n=1, skip=0, sep="\n", what="character", quiet=TRUE)
+	line <- scan(file=pipe(paste ("zcat", file)), n=1, skip=0, sep="\n", what="character", quiet=TRUE)
 	skip <- 1
 	header <- c()
 	while(substr(line, 0 ,1) == "#" ){
@@ -46,7 +46,7 @@ read.vcf.header <- function(file){
 
 read.vcf.quick.noinfo <- function(file, vR_id ,tR_id ,filter ){
 	header <- read.vcf.header(file)
-	data <- fread(paste0("bzcat ",file," | tail -n +",header$nlines," | cut -f1-7,9,10"), header=FALSE, stringsAsFactors=F, sep="\t")	
+	data <- fread(paste0("zcat ",file," | tail -n +",header$nlines," | cut -f1-7,9,10"), header=FALSE, stringsAsFactors=F, sep="\t")	
 	setnames(data, header$header[-8])
 	
 	data <- data[which(data$FILTER == filter),]
