@@ -105,11 +105,17 @@ calcRPKMsFromBAMs <- function (bedFile, bamFiles, sampleNames, outputDir, mc.cor
 				file <- bamFiles[i]
 				prefix <- sampleNames[i]
 				outputFile <- paste0(outputDir, prefix, "_rpkm2.txt")
+				if (file.exists(outputFile)) {  # skip calculation if rpkm file exists
+					print (paste0("task - ", i, " - Skip existing file: " , outputFile))
+					return(i)
+				}
+				print (paste0("task - ", i, " - Counting reads in bam: " , file))
 				res <-  featureCounts(files=file, annot.ext=df, allowMultiOverlap=TRUE, nthreads=3)
 				total <- sum(res$stat[2])
 				counts <- data.frame(res$counts)
 				colnames(counts) <- "count"
 				counts$RPKM <-  as.numeric(1e9 * as.numeric(counts$count)) / as.numeric(as.numeric(df$End - df$Start) * as.numeric(total))
+				counts$RPKM <- round(counts$RPKM, 2)  # round numbers to save disk space
 				write.table(counts, file=outputFile, sep="\t", col.names=T, row.names=F, quote=F)
 			},mc.cores=mc.cores)
 	
